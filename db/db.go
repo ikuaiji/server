@@ -3,6 +3,7 @@ package db
 import (
 	"app"
 
+	sqldriver "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -10,9 +11,19 @@ import (
 var dbConn *gorm.DB
 
 //Init初始化数据库连接
-//dsn格式： user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local
 func Init(dsn string) error {
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	//强制设置几个重要的DSN Params
+	dbConfig, err := sqldriver.ParseDSN(dsn)
+	if err != nil {
+		return err
+	}
+	if dbConfig.Params == nil {
+		dbConfig.Params = make(map[string]string)
+	}
+	dbConfig.Params["charset"] = "utf8mb4"
+	dbConfig.Params["parseTime"] = "True"
+
+	db, err := gorm.Open(mysql.Open(dbConfig.FormatDSN()), &gorm.Config{})
 	if err != nil {
 		return err
 	}
