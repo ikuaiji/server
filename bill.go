@@ -13,6 +13,7 @@ type Bill struct {
 	CategoryId uint
 	AccountId  uint
 	Amount     float32
+	Account2Id uint      //转账交易的对端账户
 	BillAt     time.Time //入账时间
 	MemberId   uint
 	ProjectId  uint
