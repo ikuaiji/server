@@ -2,6 +2,7 @@ package db
 
 import (
 	"app"
+	"time"
 
 	sqldriver "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
@@ -52,4 +53,19 @@ func TruncateAllTable() error {
 
 func Save(data interface{}) *gorm.DB {
 	return dbConn.Save(data)
+}
+
+//GetBillsOfMonth 获取指定月份的所有交易记录
+func GetBillsOfMonth(year int, month time.Month) ([]app.Bill, error) {
+	var records []app.Bill
+
+	from := time.Date(year, month, 1, 0, 0, 0, 0, app.TZ)
+	to := time.Date(year, month, 1, 0, 0, 0, 0, app.TZ).AddDate(0, 1, 0)
+
+	result := dbConn.Where("bill_at BETWEEN ? AND ?", from, to).Find(&records)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return records, nil
 }
