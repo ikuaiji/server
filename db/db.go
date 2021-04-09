@@ -69,3 +69,38 @@ func GetBillsOfMonth(year int, month time.Month) ([]app.Bill, error) {
 
 	return records, nil
 }
+
+//GetMetaIdNameMap 获取所有Meta信息的id-name映射表，用于前端显示
+func GetMetaIdNameMap() (map[string]map[uint]string, error) {
+	type IdName struct {
+		ID   uint
+		Name string
+	}
+
+	tables := []string{
+		"accounts",
+		"categories",
+		"members",
+		"projects",
+		"stores",
+	}
+
+	metaMap := make(map[string]map[uint]string)
+	for _, table := range tables {
+		var records []IdName
+		result := dbConn.Table(table).Select("name", "id").Scan(&records)
+		if result.Error != nil {
+			return nil, result.Error
+		}
+
+		m := make(map[uint]string, len(records))
+		for _, record := range records {
+			m[record.ID] = record.Name
+		}
+
+		metaMap[table] = m
+	}
+
+	return metaMap, nil
+
+}
