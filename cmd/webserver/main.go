@@ -29,6 +29,8 @@ func main() {
 	//初始化Gin并注册路由
 	r := gin.Default()
 	r.GET("/bills", BillsIndexHandler)
+	r.GET("/accounts", AccountsIndexHandler)
+	r.GET("/account_balances", AccountBalancesIndexHandler)
 
 	//启动HTTP侦听器
 	r.Run(listen)
@@ -67,4 +69,26 @@ func BillsIndexHandler(c *gin.Context) {
 	}
 
 	RenderData(c, gin.H{"bills": bills, "id_names": idNames})
+}
+
+//AccountsIndexHandler 是GET /accounts接口的处理函数
+func AccountsIndexHandler(c *gin.Context) {
+	accounts, err := db.GetAccounts()
+	if err != nil {
+		RenderError(c, err)
+		return
+	}
+
+	RenderData(c, accounts)
+}
+
+//AccountBalancesIndexHandler 是GET /account_balances接口的处理函数
+func AccountBalancesIndexHandler(c *gin.Context) {
+	balances, err := db.GetAccountBalances()
+	if err != nil {
+		RenderError(c, err)
+		return
+	}
+
+	RenderData(c, balances)
 }
