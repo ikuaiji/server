@@ -39,8 +39,9 @@ func main() {
 //BillsIndexHandler 是GET /bills接口的处理函数
 func BillsIndexHandler(c *gin.Context) {
 	var param struct {
-		Year  int        `form:"year"`
-		Month time.Month `form:"month"`
+		Year      int        `form:"year"`
+		Month     time.Month `form:"month"`
+		AccountID uint       `form:"account_id"`
 	}
 
 	if err := c.ShouldBindQuery(&param); err != nil {
@@ -56,7 +57,7 @@ func BillsIndexHandler(c *gin.Context) {
 		param.Month = now.Month()
 	}
 
-	bills, err := db.GetBillsOfMonth(param.Year, param.Month)
+	bills, err := db.GetBillsOfMonth(param.Year, param.Month, param.AccountID)
 	if err != nil {
 		RenderError(c, err)
 		return

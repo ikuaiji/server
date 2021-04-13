@@ -56,13 +56,18 @@ func Save(data interface{}) *gorm.DB {
 }
 
 //GetBillsOfMonth 获取指定月份的所有交易记录
-func GetBillsOfMonth(year int, month time.Month) ([]app.Bill, error) {
+func GetBillsOfMonth(year int, month time.Month, accountId uint) ([]app.Bill, error) {
 	var records []app.Bill
 
 	from := time.Date(year, month, 1, 0, 0, 0, 0, app.TZ)
 	to := time.Date(year, month, 1, 0, 0, 0, 0, app.TZ).AddDate(0, 1, 0)
 
-	result := dbConn.Where("bill_at BETWEEN ? AND ?", from, to).Find(&records)
+	q := dbConn.Where("bill_at BETWEEN ? AND ?", from, to)
+	if accountId > 0 {
+		q.Where("account_id = ? or account2_id = ?", accountId, accountId)
+	}
+
+	result := q.Find(&records)
 	if result.Error != nil {
 		return nil, result.Error
 	}
