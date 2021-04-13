@@ -125,7 +125,7 @@ func GetAccounts() ([]app.Account, error) {
 //GetAccountBalances 获取所有账号的余额，余额等于收入➖支出➕转入➖转出
 func GetAccountBalances() (map[uint]float32, error) {
 	balances := make(map[uint]float32)
-	var income, outcome, trasferIn []app.Bill
+	var income, outcome, trasferIn, alter []app.Bill
 
 	//先计算收入
 	result := dbConn.Select("account_id, sum(amount) as amount").Where("type = 'income'").Group("account_id").Find(&income)
@@ -152,6 +152,15 @@ func GetAccountBalances() (map[uint]float32, error) {
 	}
 	for _, record := range trasferIn {
 		balances[record.Account2Id] += record.Amount
+	}
+
+	//最后计算人工调账
+	result = dbConn.Select("account_id, sum(amount) as amount").Where("type='alter'").Group("account_id").Find(&alter)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	for _, record := range alter {
+		balances[record.AccountId] += record.Amount
 	}
 
 	return balances, nil
