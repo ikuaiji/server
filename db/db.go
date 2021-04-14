@@ -165,3 +165,35 @@ func GetAccountBalances() (map[uint]float32, error) {
 
 	return balances, nil
 }
+
+//GetCategories 获取所有分类的基础信息
+func GetCategories() ([]app.Category, error) {
+	var records []app.Category
+
+	result := dbConn.Find(&records)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return records, nil
+}
+
+//GetCategorySums 获取指定月份各分类的总余额
+func GetCategorySums(year int, month time.Month) (map[uint]float32, error) {
+	sums := make(map[uint]float32)
+	var records []app.Bill
+
+	from := time.Date(year, month, 1, 0, 0, 0, 0, app.TZ)
+	to := time.Date(year, month, 1, 0, 0, 0, 0, app.TZ).AddDate(0, 1, 0)
+
+	result := dbConn.Select("category_id, sum(amount) as amount").Where("bill_at BETWEEN ? AND ?", from, to).Where("category_id!=0").Group("category_id").Find(&records)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	for _, record := range records {
+		sums[record.CategoryId] += record.Amount
+	}
+
+	return sums, nil
+}

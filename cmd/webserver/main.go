@@ -30,7 +30,9 @@ func main() {
 	r := gin.Default()
 	r.GET("/bills", BillsIndexHandler)
 	r.GET("/accounts", AccountsIndexHandler)
+	r.GET("/categories", CategoriesIndexHandler)
 	r.GET("/account_balances", AccountBalancesIndexHandler)
+	r.GET("/category_sums", CategorySumsIndexHandler)
 
 	//启动HTTP侦听器
 	r.Run(listen)
@@ -92,4 +94,44 @@ func AccountBalancesIndexHandler(c *gin.Context) {
 	}
 
 	RenderData(c, balances)
+}
+
+//CategoriesIndexHandler 是GET /categories接口的处理函数
+func CategoriesIndexHandler(c *gin.Context) {
+	records, err := db.GetCategories()
+	if err != nil {
+		RenderError(c, err)
+		return
+	}
+
+	RenderData(c, records)
+}
+
+//CategorySumsIndexHandler 是GET /category_sums接口的处理函数
+func CategorySumsIndexHandler(c *gin.Context) {
+	var param struct {
+		Year  int        `form:"year"`
+		Month time.Month `form:"month"`
+	}
+
+	if err := c.ShouldBindQuery(&param); err != nil {
+		RenderError(c, err)
+		return
+	}
+
+	now := time.Now().In(app.TZ)
+	if param.Year == 0 {
+		param.Year = now.Year()
+	}
+	if param.Month == 0 {
+		param.Month = now.Month()
+	}
+
+	result, err := db.GetCategorySums(param.Year, param.Month)
+	if err != nil {
+		RenderError(c, err)
+		return
+	}
+
+	RenderData(c, result)
 }
