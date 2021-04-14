@@ -110,7 +110,7 @@ func GetMetaIdNameMap() (map[string]map[uint]string, error) {
 
 }
 
-//GetAccounts 获取所有账号的基础信息及余额
+//GetAccounts 获取所有账号的信息
 func GetAccounts() ([]app.Account, error) {
 	var records []app.Account
 
