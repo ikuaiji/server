@@ -51,8 +51,8 @@ func TruncateAllTable() error {
 	return nil
 }
 
-func Save(data interface{}) *gorm.DB {
-	return dbConn.Save(data)
+func Save(data interface{}) error {
+	return dbConn.Save(data).Error
 }
 
 //GetBillsOfMonth 获取指定月份的所有交易记录
@@ -73,6 +73,18 @@ func GetBillsOfMonth(year int, month time.Month, accountId uint) ([]app.Bill, er
 	}
 
 	return records, nil
+}
+
+//GetBill 获取指定月份的所有交易记录
+func GetBill(id interface{}) (*app.Bill, error) {
+	var record app.Bill
+
+	result := dbConn.First(&record, id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &record, nil
 }
 
 //GetMetaIdNameMap 获取所有Meta信息的id-name映射表，用于前端显示
