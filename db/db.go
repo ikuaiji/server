@@ -134,6 +134,18 @@ func GetAccounts() ([]app.Account, error) {
 	return records, nil
 }
 
+//GetAccount 获取所有账号的信息
+func GetAccount(id interface{}) (*app.Account, error) {
+	var record app.Account
+
+	result := dbConn.Find(&record, id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &record, nil
+}
+
 //GetAccountBalances 获取所有账号的余额，余额等于收入➖支出➕转入➖转出
 func GetAccountBalances() (map[uint]float32, error) {
 	balances := make(map[uint]float32)
