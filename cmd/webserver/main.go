@@ -16,7 +16,7 @@ var apiRouter = ginEngine.Group("/api")
 
 func init() {
 	flag.StringVar(&dsn, "dsn", "root:root@tcp(127.0.0.1:3306)/laokuaiji", "数据库DSN")
-	flag.StringVar(&listen, "listen", ":8081", "侦听地址")
+	flag.StringVar(&listen, "listen", ":80", "侦听地址")
 	flag.StringVar(&staticPath, "static", "../web/dist", "前端静态文件的路径")
 }
 
