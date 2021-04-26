@@ -3,19 +3,22 @@ package main
 import (
 	"app"
 	"app/db"
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func init() {
-	apiRouter.GET("/bills", BillsIndexHandler)
+	apiRouter.GET("/bills", BillsGetHandler)
+	apiRouter.POST("/bills", BillsPostHandler)
+
 	apiRouter.GET("/bill/:id", BillGetHandler)
 	apiRouter.POST("/bill/:id", BillPostHandler)
 }
 
 //BillsIndexHandler 是GET /bills接口的处理函数
-func BillsIndexHandler(c *gin.Context) {
+func BillsGetHandler(c *gin.Context) {
 	var param struct {
 		Year      int        `form:"year"`
 		Month     time.Month `form:"month"`
@@ -48,6 +51,29 @@ func BillsIndexHandler(c *gin.Context) {
 	}
 
 	RenderData(c, gin.H{"bills": bills, "id_names": idNames})
+}
+
+//BillsPostHandler 是POST /bills接口的处理函数
+func BillsPostHandler(c *gin.Context) {
+	var bill app.Bill
+	if err := c.ShouldBindJSON(&bill); err != nil {
+		RenderError(c, err)
+		return
+	}
+
+	//始终以URI中的ID为准
+	if bill.ID > 0 {
+		RenderError(c, fmt.Errorf("Invalid bill attribute: id should be empty"))
+		return
+	}
+
+	err := db.Save(&bill)
+	if err != nil {
+		RenderError(c, err)
+		return
+	}
+
+	RenderData(c, bill)
 }
 
 func BillGetHandler(c *gin.Context) {
