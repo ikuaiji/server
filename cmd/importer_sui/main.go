@@ -16,7 +16,7 @@ var sheets = []string{"支出", "收入", "余额变更", "转账"}
 
 func init() {
 	flag.BoolVar(&truncateAll, "truncate", true, "是否清空现有数据")
-	flag.StringVar(&dsn, "dsn", "root:root@tcp(127.0.0.1:3306)/laokuaiji?charset=utf8mb4&parseTime=True&loc=Local", "数据库DSN")
+	flag.StringVar(&dsn, "dsn", "root:root@tcp(127.0.0.1:3306)/ikuaiji?charset=utf8mb4&parseTime=True&loc=Local", "数据库DSN")
 }
 
 func main() {
