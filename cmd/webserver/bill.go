@@ -15,6 +15,7 @@ func init() {
 
 	apiRouter.GET("/bill/:id", BillGetHandler)
 	apiRouter.POST("/bill/:id", BillPostHandler)
+	apiRouter.DELETE("/bill/:id", BillDeleteHandler)
 }
 
 //BillsIndexHandler 是GET /bills接口的处理函数
@@ -119,6 +120,33 @@ func BillPostHandler(c *gin.Context) {
 	bill.ID = param.ID
 
 	err := db.Save(&bill)
+	if err != nil {
+		RenderError(c, err)
+		return
+	}
+
+	RenderData(c, true)
+}
+
+//BillDeleteHandler 是DELETE /bill/:id 接口的处理函数
+func BillDeleteHandler(c *gin.Context) {
+	var param struct {
+		ID uint `uri:"id"`
+	}
+	if err := c.ShouldBindUri(&param); err != nil {
+		RenderError(c, err)
+		return
+	}
+
+	if param.ID == 0 {
+		RenderError(c, fmt.Errorf("Invalid bill id (%d) to delete", param.ID))
+		return
+	}
+
+	var bill app.Bill
+	bill.ID = param.ID
+
+	err := db.Delete(&bill)
 	if err != nil {
 		RenderError(c, err)
 		return

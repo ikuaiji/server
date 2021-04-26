@@ -55,6 +55,10 @@ func Save(data interface{}) error {
 	return dbConn.Save(data).Error
 }
 
+func Delete(data interface{}) error {
+	return dbConn.Delete(data).Error
+}
+
 //GetBillsOfMonth 获取指定月份的所有交易记录
 func GetBillsOfMonth(year int, month time.Month, accountId uint) ([]app.Bill, error) {
 	var records []app.Bill
