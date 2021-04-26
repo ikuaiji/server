@@ -71,7 +71,7 @@ func GetBillsOfMonth(year int, month time.Month, accountId uint) ([]app.Bill, er
 		q.Where("account_id = ? or account2_id = ?", accountId, accountId)
 	}
 
-	result := q.Find(&records)
+	result := q.Order("bill_at DESC").Find(&records)
 	if result.Error != nil {
 		return nil, result.Error
 	}

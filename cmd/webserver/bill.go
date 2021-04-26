@@ -14,7 +14,7 @@ func init() {
 	apiRouter.POST("/bills", BillsPostHandler)
 
 	apiRouter.GET("/bill/:id", BillGetHandler)
-	apiRouter.POST("/bill/:id", BillPostHandler)
+	apiRouter.PUT("/bill/:id", BillPutHandler)
 	apiRouter.DELETE("/bill/:id", BillDeleteHandler)
 }
 
@@ -77,6 +77,7 @@ func BillsPostHandler(c *gin.Context) {
 	RenderData(c, bill)
 }
 
+//BillGetHandler 是GET /bill/:id 接口的处理函数
 func BillGetHandler(c *gin.Context) {
 	var param struct {
 		ID uint `uri:"id"`
@@ -101,7 +102,8 @@ func BillGetHandler(c *gin.Context) {
 	RenderData(c, gin.H{"bill": bill, "id_names": idNames})
 }
 
-func BillPostHandler(c *gin.Context) {
+//BillPutHandler 是PUT /bill/:id 接口的处理函数
+func BillPutHandler(c *gin.Context) {
 	var bill app.Bill
 	if err := c.ShouldBindJSON(&bill); err != nil {
 		RenderError(c, err)
