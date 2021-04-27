@@ -225,3 +225,52 @@ func GetCategorySums(year int, month time.Month) (map[uint]float32, error) {
 
 	return sums, nil
 }
+
+//GetFirstBillAt 获取第一次记账的时间
+func GetFirstBillAt() (time.Time, error) {
+	var record app.Bill
+
+	result := dbConn.Order("bill_at ASC").First(&record)
+	if result.Error != nil {
+		return time.Time{}, result.Error
+	}
+
+	return record.BillAt, nil
+}
+
+//GetBillsCount 获取账目数量
+func GetBillsCount() (uint, error) {
+	var count int64
+
+	result := dbConn.Model(&app.Bill{}).Count(&count)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return uint(count), nil
+}
+
+//GetBalance 获取账户总余额
+func GetBalance() (float32, error) {
+	var records []app.Bill
+
+	//先计算收入
+	result := dbConn.Select("type, sum(amount) as amount").Group("type").Find(&records)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	var balance float32
+	for _, record := range records {
+		switch record.Type {
+		case "income":
+			balance += record.Amount
+		case "outcome":
+			balance -= record.Amount
+		case "alter":
+			balance += record.Amount
+		}
+	}
+
+	return balance, nil
+}
